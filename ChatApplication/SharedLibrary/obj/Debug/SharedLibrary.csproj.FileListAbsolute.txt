@@ -1,0 +1,6 @@
+C:\Users\USER\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\SharedLibrary\bin\Debug\SharedLibrary.dll
+C:\Users\USER\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\SharedLibrary\bin\Debug\SharedLibrary.pdb
+C:\Users\USER\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\SharedLibrary\obj\Debug\SharedLibrary.csproj.AssemblyReference.cache
+C:\Users\USER\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\SharedLibrary\obj\Debug\SharedLibrary.csproj.CoreCompileInputs.cache
+C:\Users\USER\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\SharedLibrary\obj\Debug\SharedLibrary.dll
+C:\Users\USER\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\SharedLibrary\obj\Debug\SharedLibrary.pdb
