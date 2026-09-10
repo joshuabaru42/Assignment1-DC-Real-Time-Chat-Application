@@ -1,4 +1,6 @@
 <Solution>
+  <Project Path="ChatServer/ChatServer.csproj" Id="295fc79b-72c0-4e8e-b8b1-9997c5cf5994" />
+  <Project Path="DuplexClient/DuplexClient.csproj" Id="9880aa82-4397-4f6f-9e42-bee65746d1f7" />
   <Project Path="PollingClient/PollingClient.csproj" Id="251e7fc6-f38f-4fd8-9ed7-e00cf463f0af" />
   <Project Path="SharedLibrary/SharedLibrary.csproj" Id="735c22fb-0964-4a02-8b93-0e4072343c63" />
 </Solution>

@@ -31,6 +31,13 @@ namespace SharedLibrary
         [OperationContract]
         List<string> GetChannelMembers(string channelName);
 
+        [OperationContract]
+        bool SignIn(string userId, out string reason);
+
+        [OperationContract]
+        void SignOut(string userId);
+
+
 
     }
 }

@@ -16,3 +16,5 @@ C:\Users\USER\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplica
 C:\Users\USER\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\PollingClient\obj\Debug\PollingC.7E22049C.Up2Date
 C:\Users\USER\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\PollingClient\obj\Debug\PollingClient.exe
 C:\Users\USER\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\PollingClient\obj\Debug\PollingClient.pdb
+C:\Users\User\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\PollingClient\obj\Debug\SignInWindow.baml
+C:\Users\User\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\PollingClient\obj\Debug\SignInWindow.g.cs

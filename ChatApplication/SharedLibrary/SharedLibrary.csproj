@@ -45,6 +45,8 @@
   <ItemGroup>
     <Compile Include="ChannelInfo.cs" />
     <Compile Include="IChannelService.cs" />
+    <Compile Include="IDuplexChatCallback.cs.cs" />
+    <Compile Include="IDuplexChatService.cs" />
     <Compile Include="PublicMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

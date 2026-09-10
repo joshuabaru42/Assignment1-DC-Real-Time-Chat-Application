@@ -1,0 +1,10 @@
+C:\Users\User\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\ChatServer\bin\Debug\ChatServer.exe.config
+C:\Users\User\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\ChatServer\bin\Debug\ChatServer.exe
+C:\Users\User\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\ChatServer\bin\Debug\ChatServer.pdb
+C:\Users\User\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\ChatServer\bin\Debug\SharedLibrary.dll
+C:\Users\User\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\ChatServer\bin\Debug\SharedLibrary.pdb
+C:\Users\User\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\ChatServer\obj\Debug\ChatServer.csproj.AssemblyReference.cache
+C:\Users\User\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\ChatServer\obj\Debug\ChatServer.csproj.CoreCompileInputs.cache
+C:\Users\User\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\ChatServer\obj\Debug\ChatServer.csproj.Up2Date
+C:\Users\User\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\ChatServer\obj\Debug\ChatServer.exe
+C:\Users\User\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\ChatServer\obj\Debug\ChatServer.pdb

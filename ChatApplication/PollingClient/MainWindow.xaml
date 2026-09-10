@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PollingClient"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="700">
+        Title="MainWindow" Height="650" Width="730">
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200" />
@@ -14,7 +14,7 @@
 
         <StackPanel Grid.Column="0" Margin="0,0,10,0">
             <TextBlock Text="User ID: " FontWeight="Bold"/>
-            <TextBox x:Name="TxtUserId" Margin=" 0, 0, 0, 10" Text="UserB" />
+            <TextBox x:Name="TxtUserId" Margin=" 0, 0, 0, 10" IsReadOnly="True" />
 
             <TextBlock Text=" Channel Name: " FontWeight="Bold" />
             <TextBox x:Name="TxtChannelName" Margin=" 0, 0, 0, 10" Text="General" />
@@ -22,10 +22,13 @@
             <Button Content="Create Channel" Click="CreateChannelButton_Click" Margin=" 0, 0, 0, 5"/>
             <Button Content="Join Channel" Click="JoinChannelButton_Click" Margin=" 0, 0, 0, 15"/>
 
+            <TextBlock Text="Available Channels:" FontWeight="Bold" Margin="0,10,0,0"/>
+            <ListBox x:Name="ChannelList" Height="80" SelectionChanged="ChannelList_SelectionChanged"/>
+
             <TextBlock Text=" Active Members: " FontWeight="Bold" />
             <ListBox x:Name="MemberList" Height=" 150 "/>
+            <Button x:Name="SignOutButton" Content="Sign Out" Width="100" Height="30" Click="SignOutButton_Click"/>
         </StackPanel>
-
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
