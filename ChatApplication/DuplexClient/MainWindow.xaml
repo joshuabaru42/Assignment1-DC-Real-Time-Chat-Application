@@ -21,7 +21,9 @@
             <TextBlock Text="Active Members:" FontWeight="Bold" Margin="0,15,0,5"/>
             <ListBox x:Name="MemberList" Height="100"/>
             <TextBlock Text="Messages:" FontWeight="Bold" Margin="0,20,0,5"/>
-            <ListBox x:Name="MessageList" Height="150"/>
+            <ListBox x:Name="MessageList" Height="84"/>
+            <TextBox x:Name="TxtMessage" Height="28" Margin="0,10,0,5"/>
+            <Button x:Name="SendMessageButton" Content="Send Message" Height="28" Click="SendMessageButton_Click"/>
         </StackPanel>
 
     </Grid>

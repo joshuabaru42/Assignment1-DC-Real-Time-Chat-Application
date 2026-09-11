@@ -278,5 +278,57 @@ namespace DuplexClient
                 channelFactory?.Abort();
             }
         }
+        private void SendMessageButton_Click(object sender, RoutedEventArgs e)
+        {
+            string message = TxtMessage.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(currentUserId))
+            {
+                MessageBox.Show(
+                    "Please sign in first.",
+                    "Send Message",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(currentChannelName))
+            {
+                MessageBox.Show(
+                    "Please join a channel first.",
+                    "Send Message",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                MessageBox.Show(
+                    "Please enter a message.",
+                    "Send Message",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            try
+            {
+                proxy.SendPublicMessage(currentUserId, message);
+                TxtMessage.Clear();
+            }
+            catch (CommunicationException ex)
+            {
+                MessageBox.Show(
+                    $"Unable to send message.\n{ex.Message}",
+                    "Send Message Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
     }
 }
