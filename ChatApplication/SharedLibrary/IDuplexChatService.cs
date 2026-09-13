@@ -35,5 +35,14 @@ namespace SharedLibrary
 
         [OperationContract]
         void UnregisterCallback(string userId);
+
+        [OperationContract]
+        bool SendPrivateMessage(string userId, string recipientId, string message, out string reason);
+
+        [OperationContract]
+        bool ShareFile(string userId, string fileName, byte[] content, out string reason);
+
+        [OperationContract]
+        byte[] DownloadFile(string userId, string channelName, string fileName);
     }
 }

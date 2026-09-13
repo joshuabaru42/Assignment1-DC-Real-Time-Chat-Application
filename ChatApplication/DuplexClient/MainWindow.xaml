@@ -14,16 +14,24 @@
             <Button x:Name="SignInButton" Content="Sign In" Height="35" Click="SignInButton_Click"/>
             <TextBlock x:Name="StatusText" Text="Not signed in" Margin="0,15,0,0" HorizontalAlignment="Center"/>
             <TextBlock Text="Available Channels:" FontWeight="Bold" Margin="0,20,0,5"/>
+            <TextBox x:Name="TxtNewChannelName" Height="28" Margin="0,0,0,5" ToolTip="New channel name"/>
             <ListBox x:Name="ChannelList" Height="100" Margin="0,0,0,10"/>
-            <Button x:Name="RefreshChannelsButton" Content="Refresh Channels" Height="35" Margin="0,0,0,10" Click="RefreshChannelsButton_Click"/>
+            <Button x:Name="CreateChannelButton" Content="Create Channel" Height="35" Margin="0,0,0,10" Click="CreateChannelButton_Click"/>
             <Button x:Name="JoinChannelButton" Content="Join Selected Channel" Height="35" Click="JoinChannelButton_Click"/>
+            <Button x:Name="LeaveChannelButton" Content="Leave Channel" Height="35" Margin="0,5,0,0" Click="LeaveChannelButton_Click"/>
             <TextBlock x:Name="CurrentChannelText" Text="Current Channel: None" Margin="0,15,0,0" HorizontalAlignment="Center"/>
             <TextBlock Text="Active Members:" FontWeight="Bold" Margin="0,15,0,5"/>
             <ListBox x:Name="MemberList" Height="100"/>
+            <TextBox x:Name="TxtPrivateRecipient" Height="28" Margin="0,8,0,5" ToolTip="Select a member ID"/>
+            <Button Content="Open Private Conversation" Height="28" Click="OpenPrivateConversationButton_Click"/>
             <TextBlock Text="Messages:" FontWeight="Bold" Margin="0,20,0,5"/>
             <ListBox x:Name="MessageList" Height="84"/>
             <TextBox x:Name="TxtMessage" Height="28" Margin="0,10,0,5"/>
             <Button x:Name="SendMessageButton" Content="Send Message" Height="28" Click="SendMessageButton_Click"/>
+            <TextBlock Text="Shared files:" FontWeight="Bold" Margin="0,12,0,3"/>
+            <ListBox x:Name="FileList" Height="70" MouseDoubleClick="FileList_MouseDoubleClick"/>
+            <Button Content="Share File" Height="28" Margin="0,5,0,0" Click="ShareFileButton_Click"/>
+            <Button Content="Sign Out" Height="28" Margin="0,5,0,0" Click="SignOutButton_Click"/>
         </StackPanel>
 
     </Grid>

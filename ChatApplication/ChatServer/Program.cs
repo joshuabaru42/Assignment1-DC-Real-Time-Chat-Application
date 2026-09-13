@@ -9,6 +9,7 @@ namespace ChatServer
         static void Main(string[] args)
         {
             NetTcpBinding tcpBinding = new NetTcpBinding();
+            ConfigureBinding(tcpBinding);
 
             ServiceHost serviceHost = new ServiceHost(typeof(ChatService));
 
@@ -35,6 +36,16 @@ namespace ChatServer
             Console.ReadLine();
 
             serviceHost.Close();
+        }
+
+        private static void ConfigureBinding(NetTcpBinding binding)
+        {
+            const int maximumMessageSize = 4 * 1024 * 1024;
+
+            binding.MaxReceivedMessageSize = maximumMessageSize;
+            binding.MaxBufferSize = maximumMessageSize;
+            binding.ReaderQuotas.MaxArrayLength = maximumMessageSize;
+            binding.ReaderQuotas.MaxStringContentLength = maximumMessageSize;
         }
     }
 }

@@ -4,3 +4,9 @@ C:\Users\USER\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplica
 C:\Users\USER\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\SharedLibrary\obj\Debug\SharedLibrary.csproj.CoreCompileInputs.cache
 C:\Users\USER\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\SharedLibrary\obj\Debug\SharedLibrary.dll
 C:\Users\USER\source\repos\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\SharedLibrary\obj\Debug\SharedLibrary.pdb
+C:\Users\natha\source\repos\joshuabaru42\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\SharedLibrary\bin\Debug\SharedLibrary.dll
+C:\Users\natha\source\repos\joshuabaru42\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\SharedLibrary\bin\Debug\SharedLibrary.pdb
+C:\Users\natha\source\repos\joshuabaru42\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\SharedLibrary\obj\Debug\SharedLibrary.csproj.AssemblyReference.cache
+C:\Users\natha\source\repos\joshuabaru42\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\SharedLibrary\obj\Debug\SharedLibrary.csproj.CoreCompileInputs.cache
+C:\Users\natha\source\repos\joshuabaru42\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\SharedLibrary\obj\Debug\SharedLibrary.dll
+C:\Users\natha\source\repos\joshuabaru42\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\SharedLibrary\obj\Debug\SharedLibrary.pdb

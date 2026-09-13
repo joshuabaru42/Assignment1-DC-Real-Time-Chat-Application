@@ -15,6 +15,9 @@ using System.Windows.Shapes;
 using System.ServiceModel;
 using SharedLibrary;
 using System.ComponentModel;
+using System.IO;
+using System.Diagnostics;
+using Microsoft.Win32;
 
 namespace DuplexClient
 {
@@ -28,12 +31,22 @@ namespace DuplexClient
         private DuplexCallback callback;
         private string currentUserId;
         private string currentChannelName;
+        private const long MaximumSharedFileSize = 2L * 1024L * 1024L;
+        private readonly Dictionary<string, PrivateChatWindow> privateWindows = new Dictionary<string, PrivateChatWindow>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, List<PrivateMessage>> privateHistories = new Dictionary<string, List<PrivateMessage>>(StringComparer.OrdinalIgnoreCase);
 
         public MainWindow()
         {
             InitializeComponent();
             InitializeDuplexProxy();
             this.Closing += Window_Closing;
+        }
+
+        private void CreateChannelButton_Click(object sender, RoutedEventArgs e)
+        {
+            string channelName = TxtNewChannelName.Text.Trim();
+            if (string.IsNullOrWhiteSpace(channelName)) return;
+            if (!proxy.CreateChannel(channelName)) MessageBox.Show("A channel with that name already exists.", "Create Channel");
         }
 
         private void InitializeDuplexProxy()
@@ -43,6 +56,7 @@ namespace DuplexClient
             InstanceContext callbackContext = new InstanceContext(callback);
 
             NetTcpBinding tcpBinding = new NetTcpBinding();
+            ConfigureBinding(tcpBinding);
 
             string URL = "net.tcp://localhost:8200/DuplexService";
 
@@ -52,6 +66,177 @@ namespace DuplexClient
                 URL);
 
             proxy = channelFactory.CreateChannel();
+        }
+
+        private static void ConfigureBinding(NetTcpBinding binding)
+        {
+            const int maximumMessageSize = 4 * 1024 * 1024;
+
+            binding.MaxReceivedMessageSize = maximumMessageSize;
+            binding.MaxBufferSize = maximumMessageSize;
+            binding.ReaderQuotas.MaxArrayLength = maximumMessageSize;
+            binding.ReaderQuotas.MaxStringContentLength = maximumMessageSize;
+        }
+
+        public void DisplayPrivateMessage(PrivateMessage message)
+        {
+            string participantId = string.Equals(message.SenderId, currentUserId, StringComparison.OrdinalIgnoreCase)
+                ? message.RecipientId
+                : message.SenderId;
+
+            if (string.IsNullOrWhiteSpace(participantId))
+            {
+                return;
+            }
+
+            PrivateChatWindow conversation = GetOrCreatePrivateWindow(participantId);
+
+            if (!privateHistories.ContainsKey(participantId))
+            {
+                privateHistories[participantId] = new List<PrivateMessage>();
+            }
+
+            privateHistories[participantId].Add(message);
+            conversation.AddMessage(message);
+            if (!conversation.IsVisible)
+            {
+                conversation.Show();
+            }
+            conversation.Activate();
+        }
+
+        public void UpdateFiles(string channelName, List<SharedFileInfo> files)
+        {
+            if (channelName != currentChannelName) return;
+            FileList.Items.Clear();
+            foreach (SharedFileInfo file in files) FileList.Items.Add(file);
+            FileList.DisplayMemberPath = "FileName";
+        }
+
+        private void OpenPrivateConversationButton_Click(object sender, RoutedEventArgs e)
+        {
+            string participantId = TxtPrivateRecipient.Text.Trim();
+            if (string.IsNullOrWhiteSpace(currentUserId) || string.IsNullOrWhiteSpace(currentChannelName))
+            {
+                MessageBox.Show("Sign in and join a channel first.", "Private Conversation");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(participantId) ||
+                string.Equals(participantId, currentUserId, StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("Enter another member's user ID.", "Private Conversation");
+                return;
+            }
+
+            GetOrCreatePrivateWindow(participantId).Show();
+        }
+
+        private PrivateChatWindow GetOrCreatePrivateWindow(string participantId)
+        {
+            PrivateChatWindow conversation;
+            if (privateWindows.TryGetValue(participantId, out conversation))
+            {
+                return conversation;
+            }
+
+            conversation = new PrivateChatWindow(participantId, message => SendPrivateMessage(participantId, message));
+            conversation.Owner = this;
+            conversation.Closed += (sender, args) => privateWindows.Remove(participantId);
+            privateWindows[participantId] = conversation;
+
+            List<PrivateMessage> history;
+            if (privateHistories.TryGetValue(participantId, out history))
+            {
+                foreach (PrivateMessage message in history)
+                {
+                    conversation.AddMessage(message);
+                }
+            }
+
+            return conversation;
+        }
+
+        private string SendPrivateMessage(string participantId, string message)
+        {
+            if (string.IsNullOrWhiteSpace(currentUserId) || string.IsNullOrWhiteSpace(currentChannelName))
+            {
+                return "Sign in and join a channel first.";
+            }
+
+            string reason;
+            bool sent = proxy.SendPrivateMessage(currentUserId, participantId, message, out reason);
+            return sent ? null : reason;
+        }
+
+        private void ShareFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog { Filter = "Allowed files|*.png;*.jpg;*.jpeg;*.gif;*.bmp;*.txt" };
+            if (dialog.ShowDialog() != true) return;
+
+            FileInfo selectedFile = new FileInfo(dialog.FileName);
+            if (selectedFile.Length > MaximumSharedFileSize)
+            {
+                MessageBox.Show("Files must be 2 MB or smaller.", "Share File", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                string reason;
+                bool shared = proxy.ShareFile(currentUserId, System.IO.Path.GetFileName(dialog.FileName), File.ReadAllBytes(dialog.FileName), out reason);
+                if (!shared) MessageBox.Show(reason, "Share File");
+            }
+            catch (CommunicationObjectFaultedException)
+            {
+                RecoverDuplexChannel();
+                MessageBox.Show("The file transfer connection was reset. Please try again.", "Share File Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            catch (CommunicationException ex)
+            {
+                MessageBox.Show(ex.Message, "Share File Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void RecoverDuplexChannel()
+        {
+            try
+            {
+                (proxy as IClientChannel)?.Abort();
+                channelFactory?.Abort();
+            }
+            finally
+            {
+                InitializeDuplexProxy();
+            }
+
+            if (!string.IsNullOrWhiteSpace(currentUserId))
+            {
+                try
+                {
+                    proxy.RegisterCallback(currentUserId);
+                }
+                catch (CommunicationException)
+                {
+                    StatusText.Text = "Connection reset - please sign in again";
+                }
+            }
+        }
+
+        private void FileList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            SharedFileInfo file = FileList.SelectedItem as SharedFileInfo;
+            if (file == null) return;
+            byte[] content = proxy.DownloadFile(currentUserId, currentChannelName, file.FileName);
+            if (content == null) return;
+            string path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), file.FileName);
+            File.WriteAllBytes(path, content);
+            Process.Start(path);
+        }
+
+        private void SignOutButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
         public void DisplayPublicMessage(PublicMessage message)
         {
@@ -138,29 +323,6 @@ namespace DuplexClient
             }
 
         }
-        private void RefreshChannelsButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                List<ChannelInfo> channels = proxy.GetChannel();
-
-                ChannelList.Items.Clear();
-
-                foreach (ChannelInfo channel in channels)
-                {
-                    ChannelList.Items.Add(channel.Name);
-                }
-            }
-            catch (CommunicationException ex)
-            {
-                MessageBox.Show(
-                    $"Unable to load channels.\n{ex.Message}",
-                    "Channel Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-        }
-
         private void JoinChannelButton_Click(object sender, RoutedEventArgs e)
         {
             if (ChannelList.SelectedItem == null)
@@ -214,6 +376,38 @@ namespace DuplexClient
             }
         }
 
+        private void LeaveChannelButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(currentUserId) || string.IsNullOrWhiteSpace(currentChannelName))
+            {
+                MessageBox.Show(
+                    "You are not currently in a channel.",
+                    "Leave Channel",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+                return;
+            }
+
+            try
+            {
+                proxy.LeaveChannel(currentUserId);
+                currentChannelName = null;
+                CurrentChannelText.Text = "Current Channel: None";
+                MemberList.Items.Clear();
+                MessageList.Items.Clear();
+                FileList.Items.Clear();
+                TxtPrivateRecipient.Clear();
+            }
+            catch (CommunicationException ex)
+            {
+                MessageBox.Show(
+                    $"Unable to leave the channel.\n{ex.Message}",
+                    "Leave Channel Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
         public void UpdateChannels(List<ChannelInfo> channels)
         {
             string selectedChannel = ChannelList.SelectedItem?.ToString();
@@ -249,6 +443,11 @@ namespace DuplexClient
         {
             try
             {
+                foreach (PrivateChatWindow privateWindow in new List<PrivateChatWindow>(privateWindows.Values))
+                {
+                    privateWindow.Close();
+                }
+
                 if (!string.IsNullOrWhiteSpace(currentUserId))
                 {
                     proxy.UnregisterCallback(currentUserId);

@@ -524,6 +524,14 @@ namespace ChatServer
                 state.Callbacks[cleanUserId] = callback;
             }
 
+            callback.OnChannelsUpdated(GetChannel());
+            string channelName;
+            lock (state.StateLock)
+            {
+                channelName = state.UserChannels.ContainsKey(cleanUserId) ? state.UserChannels[cleanUserId] : null;
+            }
+            if (!string.IsNullOrWhiteSpace(channelName)) NotifyFilesUpdated(channelName);
+
             return true;
         }
 
@@ -544,5 +552,89 @@ namespace ChatServer
             }
         }
 
+        public bool SendPrivateMessage(string userId, string recipientId, string message, out string reason)
+        {
+            reason = null;
+            if (string.IsNullOrWhiteSpace(userId)) { reason = "You must be signed in."; return false; }
+            if (string.IsNullOrWhiteSpace(recipientId)) { reason = "Enter a recipient user ID."; return false; }
+            if (string.IsNullOrWhiteSpace(message)) { reason = "Private message cannot be empty."; return false; }
+            IDuplexChatCallback recipientCallback = null;
+            IDuplexChatCallback senderCallback = null;
+            PrivateMessage privateMessage;
+            ChatState state = ChatState.Instance;
+            string sender = userId.Trim();
+            string recipient = recipientId.Trim();
+            lock (state.StateLock)
+            {
+                if (!state.LoggedInUsers.Contains(sender)) { reason = "The sender is not signed in."; return false; }
+                if (!state.LoggedInUsers.Contains(recipient)) { reason = "That user is not currently signed in."; return false; }
+                if (!state.UserChannels.ContainsKey(sender)) { reason = "You must join a channel first."; return false; }
+                if (!state.UserChannels.ContainsKey(recipient)) { reason = "That user is not currently in a channel."; return false; }
+                if (state.UserChannels[sender] != state.UserChannels[recipient]) { reason = "Private messages can only be sent to members of your current channel."; return false; }
+                privateMessage = new PrivateMessage { SenderId = sender, RecipientId = recipient, Content = message.Trim(), Timestamp = DateTime.Now };
+                state.Callbacks.TryGetValue(sender, out senderCallback);
+                state.Callbacks.TryGetValue(recipient, out recipientCallback);
+            }
+            NotifyPrivateMessage(recipientCallback, recipient, privateMessage);
+            if (state.Callbacks.ContainsKey(sender)) NotifyPrivateMessage(senderCallback, sender, privateMessage);
+            return true;
+        }
+
+        public bool ShareFile(string userId, string fileName, byte[] content, out string reason)
+        {
+            reason = null;
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(fileName) || content == null) { reason = "File information is incomplete."; return false; }
+            if (content.Length > 2 * 1024 * 1024) { reason = "Files must be 2 MB or smaller."; return false; }
+            string extension = System.IO.Path.GetExtension(fileName).ToLowerInvariant();
+            if (extension != ".png" && extension != ".jpg" && extension != ".jpeg" && extension != ".gif" && extension != ".bmp" && extension != ".txt") { reason = "This file type is not allowed."; return false; }
+            ChatState state = ChatState.Instance;
+            string user = userId.Trim(); string channel;
+            SharedFileInfo info;
+            lock (state.StateLock)
+            {
+                if (!state.UserChannels.TryGetValue(user, out channel)) { reason = "You must join a channel first."; return false; }
+                if (!state.SharedFiles.ContainsKey(channel)) state.SharedFiles[channel] = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
+                if (!state.FileMetadata.ContainsKey(channel)) state.FileMetadata[channel] = new List<SharedFileInfo>();
+                state.SharedFiles[channel][fileName] = content;
+                info = new SharedFileInfo { FileName = fileName, SharedBy = user, ChannelName = channel, Length = content.Length, Timestamp = DateTime.Now };
+                state.FileMetadata[channel].RemoveAll(f => f.FileName.Equals(fileName, StringComparison.OrdinalIgnoreCase));
+                state.FileMetadata[channel].Add(info);
+            }
+            NotifyFilesUpdated(channel);
+            return true;
+        }
+
+        public byte[] DownloadFile(string userId, string channelName, string fileName)
+        {
+            ChatState state = ChatState.Instance;
+            lock (state.StateLock)
+            {
+                string user = userId == null ? null : userId.Trim(); string channel = channelName == null ? null : channelName.Trim();
+                if (user == null || !state.UserChannels.ContainsKey(user) || state.UserChannels[user] != channel || !state.SharedFiles.ContainsKey(channel)) return null;
+                state.SharedFiles[channel].TryGetValue(fileName, out byte[] content);
+                return content;
+            }
+        }
+
+        private void NotifyPrivateMessage(IDuplexChatCallback callback, string userId, PrivateMessage message)
+        {
+            if (callback == null) return;
+            try { callback.OnPrivateMessageReceived(message); }
+            catch (CommunicationException) { CleanupDisconnectedUsers(new List<string> { userId }); }
+            catch (TimeoutException) { CleanupDisconnectedUsers(new List<string> { userId }); }
+        }
+
+        private void NotifyFilesUpdated(string channelName)
+        {
+            ChatState state = ChatState.Instance; List<SharedFileInfo> files; List<IDuplexChatCallback> callbacks = new List<IDuplexChatCallback>();
+            lock (state.StateLock)
+            {
+                files = state.FileMetadata.ContainsKey(channelName) ? new List<SharedFileInfo>(state.FileMetadata[channelName]) : new List<SharedFileInfo>();
+                foreach (KeyValuePair<string, IDuplexChatCallback> entry in state.Callbacks)
+                    if (state.UserChannels.ContainsKey(entry.Key) && state.UserChannels[entry.Key] == channelName) callbacks.Add(entry.Value);
+            }
+            foreach (IDuplexChatCallback callback in callbacks) try { callback.OnFilesUpdated(channelName, files); } catch (CommunicationException) { }
+            catch (TimeoutException) { }
+        }
     }
 }

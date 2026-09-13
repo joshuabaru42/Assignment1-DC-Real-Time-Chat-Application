@@ -23,6 +23,10 @@ namespace ChatServer
         public Dictionary<string, DateTime> UserJoinTimes { get; } = new Dictionary<string, DateTime>();
 
         public Dictionary<string, IDuplexChatCallback> Callbacks { get; } = new Dictionary<string, IDuplexChatCallback>();
+
+        public Dictionary<string, Dictionary<string, byte[]>> SharedFiles { get; } = new Dictionary<string, Dictionary<string, byte[]>>();
+
+        public Dictionary<string, List<SharedFileInfo>> FileMetadata { get; } = new Dictionary<string, List<SharedFileInfo>>();
         private ChatState()
         {
         }

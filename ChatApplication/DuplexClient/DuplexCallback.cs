@@ -36,5 +36,21 @@ namespace DuplexClient
                 mainWindow.DisplayPublicMessage(message);
             });
         }
+
+        public void OnPrivateMessageReceived(PrivateMessage message)
+        {
+            mainWindow.Dispatcher.Invoke(() =>
+            {
+                mainWindow.DisplayPrivateMessage(message);
+            });
+        }
+
+        public void OnFilesUpdated(string channelName, List<SharedFileInfo> files)
+        {
+            mainWindow.Dispatcher.Invoke(() =>
+            {
+                mainWindow.UpdateFiles(channelName, files);
+            });
+        }
     }
 }

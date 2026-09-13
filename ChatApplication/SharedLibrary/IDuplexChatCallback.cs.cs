@@ -13,5 +13,11 @@ namespace SharedLibrary
 
         [OperationContract(IsOneWay = true)]
         void OnPublicMessageReceived(PublicMessage message);
+
+        [OperationContract(IsOneWay = true)]
+        void OnPrivateMessageReceived(PrivateMessage message);
+
+        [OperationContract(IsOneWay = true)]
+        void OnFilesUpdated(string channelName, List<SharedFileInfo> files);
     }
 }
