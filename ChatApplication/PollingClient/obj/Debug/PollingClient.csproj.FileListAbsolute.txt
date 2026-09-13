@@ -58,3 +58,5 @@ C:\Users\natha\source\repos\joshuabaru42\Assignment1-DC-Real-Time-Chat-Applicati
 C:\Users\natha\source\repos\joshuabaru42\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\PollingClient\obj\Debug\PollingC.7E22049C.Up2Date
 C:\Users\natha\source\repos\joshuabaru42\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\PollingClient\obj\Debug\PollingClient.exe
 C:\Users\natha\source\repos\joshuabaru42\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\PollingClient\obj\Debug\PollingClient.pdb
+C:\Users\natha\source\repos\joshuabaru42\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\PollingClient\obj\Debug\PrivateChatWindow.baml
+C:\Users\natha\source\repos\joshuabaru42\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\PollingClient\obj\Debug\PrivateChatWindow.g.cs

@@ -572,12 +572,40 @@ namespace ChatServer
                 if (!state.UserChannels.ContainsKey(recipient)) { reason = "That user is not currently in a channel."; return false; }
                 if (state.UserChannels[sender] != state.UserChannels[recipient]) { reason = "Private messages can only be sent to members of your current channel."; return false; }
                 privateMessage = new PrivateMessage { SenderId = sender, RecipientId = recipient, Content = message.Trim(), Timestamp = DateTime.Now };
+                if (!state.PrivateMessages.ContainsKey(sender)) state.PrivateMessages[sender] = new List<PrivateMessage>();
+                if (!state.PrivateMessages.ContainsKey(recipient)) state.PrivateMessages[recipient] = new List<PrivateMessage>();
+                state.PrivateMessages[sender].Add(privateMessage);
+                state.PrivateMessages[recipient].Add(privateMessage);
                 state.Callbacks.TryGetValue(sender, out senderCallback);
                 state.Callbacks.TryGetValue(recipient, out recipientCallback);
             }
             NotifyPrivateMessage(recipientCallback, recipient, privateMessage);
             if (state.Callbacks.ContainsKey(sender)) NotifyPrivateMessage(senderCallback, sender, privateMessage);
             return true;
+        }
+
+        public List<PrivateMessage> GetNewPrivateMessages(string userId, DateTime lastCheck)
+        {
+            ChatState state = ChatState.Instance;
+            lock (state.StateLock)
+            {
+                string user = userId == null ? null : userId.Trim();
+                if (string.IsNullOrWhiteSpace(user) || !state.PrivateMessages.ContainsKey(user)) return new List<PrivateMessage>();
+                return state.PrivateMessages[user].FindAll(message => message.Timestamp > lastCheck);
+            }
+        }
+
+        public List<SharedFileInfo> GetSharedFiles(string userId)
+        {
+            ChatState state = ChatState.Instance;
+            lock (state.StateLock)
+            {
+                string user = userId == null ? null : userId.Trim();
+                string channel;
+                if (string.IsNullOrWhiteSpace(user) || !state.UserChannels.TryGetValue(user, out channel) || !state.FileMetadata.ContainsKey(channel))
+                    return new List<SharedFileInfo>();
+                return new List<SharedFileInfo>(state.FileMetadata[channel]);
+            }
         }
 
         public bool ShareFile(string userId, string fileName, byte[] content, out string reason)

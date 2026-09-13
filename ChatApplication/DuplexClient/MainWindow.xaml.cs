@@ -34,12 +34,31 @@ namespace DuplexClient
         private const long MaximumSharedFileSize = 2L * 1024L * 1024L;
         private readonly Dictionary<string, PrivateChatWindow> privateWindows = new Dictionary<string, PrivateChatWindow>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, List<PrivateMessage>> privateHistories = new Dictionary<string, List<PrivateMessage>>(StringComparer.OrdinalIgnoreCase);
+        private bool returningToSignIn;
 
         public MainWindow()
         {
             InitializeComponent();
             InitializeDuplexProxy();
             this.Closing += Window_Closing;
+        }
+
+        public MainWindow(string userId)
+        {
+            InitializeComponent();
+            InitializeDuplexProxy();
+            currentUserId = userId;
+            TxtUserId.Text = userId;
+            TxtUserId.IsReadOnly = true;
+            this.Closing += Window_Closing;
+
+            string reason;
+            if (!proxy.SignIn(userId, out reason) || !proxy.RegisterCallback(userId))
+            {
+                throw new InvalidOperationException(string.IsNullOrWhiteSpace(reason) ? "Callback registration failed." : reason);
+            }
+
+            StatusText.Text = "Signed in - Callback registered";
         }
 
         private void CreateChannelButton_Click(object sender, RoutedEventArgs e)
@@ -110,7 +129,6 @@ namespace DuplexClient
             if (channelName != currentChannelName) return;
             FileList.Items.Clear();
             foreach (SharedFileInfo file in files) FileList.Items.Add(file);
-            FileList.DisplayMemberPath = "FileName";
         }
 
         private void OpenPrivateConversationButton_Click(object sender, RoutedEventArgs e)
@@ -236,6 +254,10 @@ namespace DuplexClient
 
         private void SignOutButton_Click(object sender, RoutedEventArgs e)
         {
+            returningToSignIn = true;
+            CleanupSession();
+            SignInWindow signInWindow = new SignInWindow();
+            signInWindow.Show();
             Close();
         }
         public void DisplayPublicMessage(PublicMessage message)
@@ -440,6 +462,16 @@ namespace DuplexClient
             }
         }
         private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            if (returningToSignIn)
+            {
+                return;
+            }
+
+            CleanupSession();
+        }
+
+        private void CleanupSession()
         {
             try
             {

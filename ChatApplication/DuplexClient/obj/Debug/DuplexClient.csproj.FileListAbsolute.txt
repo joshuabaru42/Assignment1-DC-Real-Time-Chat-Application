@@ -54,3 +54,5 @@ C:\Users\natha\source\repos\joshuabaru42\Assignment1-DC-Real-Time-Chat-Applicati
 C:\Users\natha\source\repos\joshuabaru42\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\DuplexClient\obj\Debug\DuplexCl.C452AA4B.Up2Date
 C:\Users\natha\source\repos\joshuabaru42\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\DuplexClient\obj\Debug\PrivateChatWindow.baml
 C:\Users\natha\source\repos\joshuabaru42\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\DuplexClient\obj\Debug\PrivateChatWindow.g.cs
+C:\Users\natha\source\repos\joshuabaru42\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\DuplexClient\obj\Debug\SignInWindow.baml
+C:\Users\natha\source\repos\joshuabaru42\Assignment1-DC-Real-Time-Chat-Application\ChatApplication\DuplexClient\obj\Debug\SignInWindow.g.cs

@@ -20,6 +20,8 @@ namespace ChatServer
 
         public Dictionary<string, List<PublicMessage>> PublicMessages { get; } = new Dictionary<string, List<PublicMessage>>();
 
+        public Dictionary<string, List<PrivateMessage>> PrivateMessages { get; } = new Dictionary<string, List<PrivateMessage>>();
+
         public Dictionary<string, DateTime> UserJoinTimes { get; } = new Dictionary<string, DateTime>();
 
         public Dictionary<string, IDuplexChatCallback> Callbacks { get; } = new Dictionary<string, IDuplexChatCallback>();

@@ -37,6 +37,21 @@ namespace SharedLibrary
         [OperationContract]
         void SignOut(string userId);
 
+        [OperationContract]
+        bool SendPrivateMessage(string userId, string recipientId, string message, out string reason);
+
+        [OperationContract]
+        List<PrivateMessage> GetNewPrivateMessages(string userId, DateTime lastCheck);
+
+        [OperationContract]
+        List<SharedFileInfo> GetSharedFiles(string userId);
+
+        [OperationContract]
+        bool ShareFile(string userId, string fileName, byte[] content, out string reason);
+
+        [OperationContract]
+        byte[] DownloadFile(string userId, string channelName, string fileName);
+
 
 
     }
